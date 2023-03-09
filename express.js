@@ -4,6 +4,9 @@ const mongoose=require('mongoose');
 const PORT = process.env.PORT || 3000;
 let Models=require('./collectionModel');
 
+const PORT = process.env.PORT || 3000;
+
+
 const Demo=Models.Demo;
 const Message=Models.Message;
 
