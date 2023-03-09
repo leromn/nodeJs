@@ -9,7 +9,6 @@ router.route('/').get((req,resp)=>{
 
 router.route('/signup').post((req,resp)=>{
 
-
     const newUser=new User();
     newUser.userName=req.body.userName;
     newUser.fullName=req.body.fullName;
