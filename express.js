@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const mongoose=require('mongoose');
+const PORT = process.env.PORT || 3000;
 let Models=require('./collectionModel');
 
 const Demo=Models.Demo;
@@ -10,7 +11,7 @@ app.get("/", (request, response) => {
     response.send("Hi there");
 });
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
     console.log("Listen on the port 3000...");
 });
 console.log('started listning');
