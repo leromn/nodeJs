@@ -9,18 +9,34 @@ router.route('/').get((req,resp)=>{
 
 router.route('/signup').post((req,resp)=>{
 
-    const {userName,fullName,password,email}=req.body;
 
-    const newUser=new User({
-        fullName:fullName,  
-        userName:userName,
-        password:password,
-        email:email
-    })
+    const newUser=new User();
+    newUser.userName=req.body.userName;
+    newUser.fullName=req.body.fullName;
+    newUser.password=req.body.password;
+    newUser.email=req.body.email;
+    
 
     newUser.save()
-    .then(resp.json('inserted successfully'))
+    .then(resp.json("insertting successful"))
     .catch(err=>resp.json('error : '+err))
 });
 
+router.route('/signin').post((req,resp)=>{
+
+    const {userName,password}=req.body;
+
+    const newUser={
+        fullName:fullName, 
+        password:password
+
+        }
+    User.find({fullName:{fullName},password:{password}})
+        .then(users=>{
+            resp.json("signin succesfull")
+        })
+        .catch(err=>resp.json('error : '+err))
+
+    
+});
 module.exports = router;

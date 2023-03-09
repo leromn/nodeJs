@@ -9,13 +9,14 @@ let Models=require('./collectionModel');
 const Demo=Models.Demo;
 const Message=Models.Message;
 
+app.use(express.json());
+app.listen(PORT, () => {
+    console.log("Listen on the port 3000...");
+});
 app.get("/", (request, response) => {
     response.send("Hi there");
 });
 
-app.listen(PORT, () => {
-    console.log("Listen on the port 3000...");
-});
 console.log('started listning');
 
 const uri="mongodb+srv://esru2:Yonn4321@cluster0.sbh1vyc.mongodb.net/?retryWrites=true&w=majority";
