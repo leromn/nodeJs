@@ -17,19 +17,20 @@ const messageSchema=new schema({
 
 },{timestamps:true});
 
-const regionSchema=new schema({
-	location:{type:Number},
-	userName:{type:String},
+const locationSchema=new schema({
+	lat:{type:Number},
+	lng:{type:Number},
+	userName:{type:String}
 
 },{timestamps:true});
 
 
 
 
-const Region =mongoose.model("Region",regionSchema);
+const Location =mongoose.model("Location",locationSchema);
 const User=mongoose.model('User',userSchema);
 const Message=mongoose.model('Messages',messageSchema);
 
-module.exports.Region=Region;
+module.exports.Location=this.Location;
 module.exports.User=User;
 module.exports.Message=Message;

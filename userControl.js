@@ -1,5 +1,7 @@
 const router=require('express').Router();
 const Message=require('./collectionModel').Message;
+const Location=require('./collectionModel').Location;
+
 
 router.route('/').get((req,resp)=>{
     Message.find()
@@ -17,9 +19,26 @@ router.route('/send').post((req,resp)=>{
         message:message,
     })
 
-    newUser.save()
-    .then(resp.json('inserted successfully'))
+    newMessage.save()
+    .then(resp.json('message sent'))
     .catch(err=>resp.json('error : '+err))
 });
+
+router.route('/locUpdate').post((req,resp)=>{
+
+    const {userName,lat,lng}=req.body;
+
+    const myLocation=new Location({
+        lat:lat,
+        lng:lng,
+        userName:userName
+    })
+
+    myLocation.save()
+    .then(resp.json('location updated successfully'))
+    .catch(err=>resp.json('error : '+err))
+});
+
+
 
 module.exports = router;
