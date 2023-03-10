@@ -24,6 +24,13 @@ const locationSchema=new schema({
 
 },{timestamps:true});
 
+const Role = mongoose.model(
+	"Role",
+	new mongoose.Schema({
+	  name: String
+	})
+  );
+  
 
 
 
@@ -34,3 +41,4 @@ const Message=mongoose.model('Messages',messageSchema);
 module.exports.Location=this.Location;
 module.exports.User=User;
 module.exports.Message=Message;
+module.exports.Role= Role;
