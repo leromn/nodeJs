@@ -6,6 +6,8 @@ const jwt = require("jsonwebtoken");
 
 // const User = require("./model/user");
 const User = require("./model/collectionModel").User;
+const Message = require("./model/collectionModel").Message;
+
 
 const auth = require("./middleware/auth");
 
@@ -75,7 +77,7 @@ app.post("/login", async (req, res) => {
     if (user && (await bcrypt.compare(password, user.password))) {
       // Create token
       const token = jwt.sign(
-        { user_id: user._id, email },
+        { user_id: user._id, userName },
         "esraelCrypt",
         {
           expiresIn: "2h",
@@ -96,6 +98,26 @@ app.post("/login", async (req, res) => {
 
 app.get("/welcome", auth, (req, res) => {
   res.status(200).send("Welcome 🙌 ");
+});
+
+app.post("/message", auth, async (req, res) => {
+
+  const{sender,reciever,message}=req.body;
+
+  const newMessage=await Message.create({
+    sender,
+    reciever,
+    message
+  });
+
+  res.status(200).send("message sent ");
+});
+
+app.get("/message", auth, (req, res) => {
+  Message.find().then((res)=>{
+    res.status(200).json(res);
+  })
+  
 });
 
 // This should be the last route else any after it won't work
