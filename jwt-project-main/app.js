@@ -110,18 +110,20 @@ app.post("/message", async (req, res) => {
 
   const user1=await User.findOne({userName:sender});
 
-  const customeTableName=sender+reciever;
-  const contactExists=false;
-
+  var customeTableName=sender+reciever;
+  var contactExists=false;
+  var tempTableName='';
   // iterate through the contacts array in the object to see 
   // if the reciever is alrweady registered and has created table
   if(user1){
-
     user1.contacts.forEach(function (contact){
       if(contact.userName==reciever){
         //contact already exists
         contactExists=true;
         console.log("contact exists")
+        tempTableName=contact.chatListTable;
+
+
       }
     })
   }
@@ -143,12 +145,12 @@ app.post("/message", async (req, res) => {
     "userName":req.body.sender,
     "chatListTable":customeTableName
     }}
-  }).then(()=>{console.log("updated one ")})
+  }).then(()=>{console.log("updated two ")});
 
   }else{
     //if the contact exists
-    customeTableName=user1.contacts.chatListTable;
-    console.log("contct exist")
+    customeTableName=tempTableName;
+    console.log("contct exist: changed the table referece to the fetched")
   }
 
   const NewMessage=mongoose.model(customeTableName,messageSchema);
@@ -163,7 +165,7 @@ app.post("/message", async (req, res) => {
 
 
 
-  res.status(200).send("message sent ");
+  res.status(200).send("message sent successfully");
 });
 
 app.get("/messages", auth, (req, res) => {
