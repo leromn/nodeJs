@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 // const User = require("./model/user");
 const User = require("./model/collectionModel").User;
 const Message = require("./model/collectionModel").Message;
+const messageSchema=require('./model/collectionModel').messageSchema;
 
 
 const auth = require("./middleware/auth");
@@ -42,6 +43,8 @@ app.post("/register", async (req, res) => {
       userName,
       email: email.toLowerCase(), // sanitize: convert email to lowercase
       password: encryptedPassword,
+      token:'',
+      contacts:[{}]
     });
 
     // Create token
@@ -100,26 +103,68 @@ app.get("/welcome", auth, (req, res) => {
   res.status(200).send("Welcome 🙌 ");
 });
 
-app.post("/message", auth, async (req, res) => {
+app.post("/message", async (req, res) => {
 
   const{sender,reciever,message}=req.body;
 
-  const newMessage=await Message.create({
-    sender,
-    reciever,
-    message
-  });
+  const user1=await User.findOne({sender});
+
+  const customeTableName=sender+reciever;
+  const contactExists=false;
+  // iterate through the contacts array in the object to see 
+  // if the reciever is alrweady registered and has created table
+  if(user1){
+    user1.contacts.forEach(function (contact){
+      if(contact.userName==reciever){
+        //contact already exists
+        contactExists=true;
+      }
+    })
+  }
+
+  
+  const user2=await User.findOne({reciever});
+  if(!contactExists){
+    //insert eachother in both users contact list
+    user1.contacts.push({
+      userName:reciever,
+      chatListTable:customeTableName
+    });
+
+    user2.contacts.push({
+      userName:sender,
+      chatListTable:customeTableName
+    });
+    
+  }
+  const NewMessage=mongoose.model(customeTableName,messageSchema);
+  const newMessage=await NewMessage.create({
+      sender,
+      reciever,
+      message
+    });
+
+
+
+
+
 
   res.status(200).send("message sent ");
 });
 
-app.get("/message", auth, (req, res) => {
+app.get("/messages", auth, (req, res) => {
   Message.find().then((res)=>{
     res.status(200).json(res);
   })
   
 });
 
+app.get("/contacts", auth, (req, res) => {
+  Message.find().then((res)=>{
+    res.status(200).json(res);
+  })
+  
+});
 // This should be the last route else any after it won't work
 app.use("*", (req, res) => {
   res.status(404).json({
