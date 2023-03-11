@@ -3,6 +3,7 @@ require("./config/database").connect();
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const mongoose=require('mongoose')
 
 // const User = require("./model/user");
 const User = require("./model/collectionModel").User;
@@ -107,36 +108,49 @@ app.post("/message", async (req, res) => {
 
   const{sender,reciever,message}=req.body;
 
-  const user1=await User.findOne({sender});
+  const user1=await User.findOne({userName:sender});
 
   const customeTableName=sender+reciever;
   const contactExists=false;
+
   // iterate through the contacts array in the object to see 
   // if the reciever is alrweady registered and has created table
   if(user1){
+
     user1.contacts.forEach(function (contact){
       if(contact.userName==reciever){
         //contact already exists
         contactExists=true;
+        console.log("contact exists")
       }
     })
   }
-
-  
-  const user2=await User.findOne({reciever});
-  if(!contactExists){
-    //insert eachother in both users contact list
-    user1.contacts.push({
-      userName:reciever,
-      chatListTable:customeTableName
-    });
-
-    user2.contacts.push({
-      userName:sender,
-      chatListTable:customeTableName
-    });
-    
+  else{
+  res.status(200).send("user not found message not sent ");
   }
+
+  if(!contactExists){
+    
+      User.updateOne({userName:req.body.sender},
+      { $push: {"contacts": {
+      "userName":req.body.reciever,
+      "chatListTable":customeTableName
+      }}
+  }).then(()=>{console.log("updated one ")})
+
+    User.updateOne({userName:req.body.reciever},
+    { $push: {"contacts": {
+    "userName":req.body.sender,
+    "chatListTable":customeTableName
+    }}
+  }).then(()=>{console.log("updated one ")})
+
+  }else{
+    //if the contact exists
+    customeTableName=user1.contacts.chatListTable;
+    console.log("contct exist")
+  }
+
   const NewMessage=mongoose.model(customeTableName,messageSchema);
   const newMessage=await NewMessage.create({
       sender,

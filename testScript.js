@@ -3,14 +3,13 @@ const app = express();
 const mongoose=require('mongoose');
 const cors=require('cors')
 
-let Models=require('./collectionModel');
+let Models=require('./jwt-project-main/model/collectionModel');
 
 const PORT = process.env.PORT || 3000;
 
 
 
-const Demo=Models.Demo;
-const Message=Models.Message;
+const User=Models.User;
 
 app.use(cors());
 app.use(express.json());
@@ -36,9 +35,10 @@ connection.once('open',()=>{
         console.log('connected to database')
    });   
 
-   const authenticationRouter=require('./authenticate');
-   const userControlRouter=require('./userControl');
-   
-   app.use('/authenticate',authenticationRouter);
-   app.use('/user',userControlRouter);
-
+  
+User.updateOne({userName:"cholele21"},
+{ $push: {"contacts": {
+    "userName":"sender",
+    "chatListTable":"customeTableName"
+    }}
+}).then(()=>{console.log("updated one ")})
