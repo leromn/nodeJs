@@ -104,7 +104,7 @@ app.get("/welcome", auth, (req, res) => {
   res.status(200).send("Welcome 🙌 ");
 });
 
-app.post("/message", async (req, res) => {
+app.post("/sendMessage", async (req, res) => {
 
   const{sender,reciever,message}=req.body;
 
@@ -161,26 +161,76 @@ app.post("/message", async (req, res) => {
     });
 
 
-
-
-
-
   res.status(200).send("message sent successfully");
 });
 
-app.get("/messages", auth, (req, res) => {
-  Message.find().then((res)=>{
-    res.status(200).json(res);
+app.get("/getMessages", async (req, res) => {
+
+  const NewMessage=mongoose.model(req.body.customTableName,messageSchema);
+  NewMessage.find().then((result)=>{
+    res.json(result);
+  }).catch((err)=>console.log(err));
+
+  
+  
+});
+
+app.post("/addContact", async (req, res) => {
+
+  const{myUserName,reciever}=req.body;
+
+  const user1=await User.findOne({userName:myUserName});
+
+  var customeTableName=myUserName+reciever;
+  var contactExists=false;
+  var tempTableName='';
+  // iterate through the contacts array in the object to see 
+  // if the reciever is alrweady registered and has created table
+  if(user1){
+    user1.contacts.forEach(function (contact){
+      if(contact.userName==reciever){
+        //contact already exists
+        contactExists=true;       
+      }
+    })
+  }
+  else{
+  res.status(200).send("user not found message not sent ");
+  }
+
+  if(!contactExists){
+    
+      User.updateOne({userName:req.body.myUserName},
+      { $push: {"contacts": {
+      "userName":req.body.reciever,
+      "chatListTable":customeTableName
+      }}
+  }).then(()=>{console.log("updated one ")})
+
+    User.updateOne({userName:req.body.reciever},
+    { $push: {"contacts": {
+    "userName":req.body.myUserName,
+    "chatListTable":customeTableName
+    }}
+  }).then(()=>{
+    console.log("updated two ");
+    res.status(200).send("contact added successfully");
+  });
+
+  }else{
+    res.json("contact already exists")
+  }
+
+  });
+
+app.get("/getContacts", auth, (req, res) => {
+  User.find({userName:req.body.myUserName}).then((res)=>{
+    res.status(200).json(res.contacts);
   })
   
 });
 
-app.get("/contacts", auth, (req, res) => {
-  Message.find().then((res)=>{
-    res.status(200).json(res);
-  })
-  
-});
+
 // This should be the last route else any after it won't work
 app.use("*", (req, res) => {
   res.status(404).json({
